@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pompa Otomatis Kolam Retensi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background particles */
+        .bg-particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .bg-particle:nth-child(1) { width: 80px; height: 80px; top: 10%; left: 10%; animation-delay: 0s; }
+        .bg-particle:nth-child(2) { width: 60px; height: 60px; top: 70%; left: 80%; animation-delay: 2s; }
+        .bg-particle:nth-child(3) { width: 40px; height: 40px; top: 40%; left: 70%; animation-delay: 4s; }
+        .bg-particle:nth-child(4) { width: 100px; height: 100px; top: 80%; left: 20%; animation-delay: 1s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        /* Glassmorphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 12px;
+            vertical-align: middle;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        /* Enhanced glowing effects */
+        .glow-green {
+            background: linear-gradient(135deg, #4CAF50, #81C784);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6), 0 0 40px rgba(76, 175, 80, 0.3);
+            animation: pulse-green 2s infinite;
+        }
+        
+        .glow-orange {
+            background: linear-gradient(135deg, #FFC107, #FFD54F);
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.6), 0 0 40px rgba(255, 193, 7, 0.3);
+            animation: pulse-orange 2s infinite;
+        }
+        
+        .glow-red {
+            background: linear-gradient(135deg, #F44336, #EF5350);
+            box-shadow: 0 0 20px rgba(244, 67, 54, 0.6), 0 0 40px rgba(244, 67, 54, 0.3);
+            animation: pulse-red 2s infinite;
+        }
+        
+        .glow-gray {
+            background: linear-gradient(135deg, #9E9E9E, #BDBDBD);
+        }
+        
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.6), 0 0 40px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(76, 175, 80, 0.8), 0 0 60px rgba(76, 175, 80, 0.5); }
+        }
+        
+        @keyframes pulse-orange {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 193, 7, 0.6), 0 0 40px rgba(255, 193, 7, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 193, 7, 0.8), 0 0 60px rgba(255, 193, 7, 0.5); }
+        }
+        
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 20px rgba(244, 67, 54, 0.6), 0 0 40px rgba(244, 67, 54, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(244, 67, 54, 0.8), 0 0 60px rgba(244, 67, 54, 0.5); }
+        }
+        
+        /* Card hover effects */
+        .status-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .status-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Icon styles */
+        .icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.8;
+        }
+        
+        /* New styles for profile photo */
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 640px) {
+            .status-card {
+                padding: 1.5rem;
+            }
+            .status-indicator {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-particle"></div>
+    <div class="bg-particle"></div>
+    <div class="bg-particle"></div>
+    <div class="bg-particle"></div>
+    
+    <div class="glass p-8 rounded-3xl w-full max-w-lg relative z-10">
+        <div class="text-center mb-10">
+            <div class="flex justify-center mb-4">
+                <img src="KKN.jpg" alt="KKN-T UNDIP Logo" class="profile-photo">
+            </div>
+            
+            <h1 class="text-3xl font-bold text-white mb-2">Sistem Pompa Otomatis Kolam Retensi</h1>
+            <p class="text-white text-opacity-80 text-lg">KKNT TIM 64 Desa Kaligawe UNDIP</p>
+        </div>
+
+        <div class="space-y-6">
+            <div class="status-card glass p-6 rounded-2xl">
+                <div class="flex items-center mb-4">
+                    <svg class="icon text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25S18,10 18,14A6,6 0 0,1 12,20Z"/>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold text-white mb-4">Kondisi Kolam</h2>
+                <div class="flex items-center mb-3">
+                    <span id="kolam-indicator" class="status-indicator glow-gray"></span>
+                    <p id="kolam-status" class="text-2xl font-bold text-white">Memuat...</p>
+                </div>
+                <p class="text-white text-opacity-70 text-sm">Indikator level air kolam secara real-time</p>
+            </div>
+
+            <div class="status-card glass p-6 rounded-2xl">
+                <div class="flex items-center mb-4">
+                    <!-- Reverted to the original checkmark icon for the pump status -->
+                    <svg class="icon text-green-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,16.5L18,9.5L16.59,8.09L11,13.67L7.91,10.59L6.5,12L11,16.5Z"/>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold text-white mb-4">Kondisi Pompa</h2>
+                <div class="flex items-center mb-3">
+                    <span id="pompa-indicator" class="status-indicator glow-gray"></span>
+                    <p id="pompa-status" class="text-2xl font-bold text-white">Memuat...</p>
+                </div>
+                <p class="text-white text-opacity-70 text-sm">Status operasional pompa air otomatis</p>
+            </div>
+        </div>
+
+        <div class="mt-10 text-center">
+            <div class="flex items-center justify-center space-x-2 mb-3">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <p class="text-white text-opacity-80 text-sm font-medium">Live Status dari Firebase</p>
+            </div>
+        </div>
+        
+        <!-- New Multidisiplin Section -->
+        <div class="mt-8 text-center text-white text-opacity-80">
+            <p class="font-semibold text-lg">Multidisiplin 1</p>
+            <p class="text-sm">Oleh :</p>
+            <p class="text-sm">Farhan Aditya Ardan</p>
+            <p class="text-sm">(Teknologi Rekayasa Otomasi)</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Your Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBg9bYFwBeg7eruq_NwqcYuTEWHjdLap64",
+            authDomain: "automatic-pump-6e3f0.firebaseapp.com",
+            databaseURL: "https://automatic-pump-6e3f0-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "automatic-pump-6e3f0",
+            storageBucket: "automatic-pump-6e3f0.firebasestorage.app",
+            messagingSenderId: "107402758980",
+            appId: "1:107402758980:web:b4dfc37c7ffef0d0e9e511",
+            measurementId: "G-DBMESPHH1B"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the database service
+        const database = firebase.database();
+
+        let kolamStatusElement = document.getElementById('kolam-status');
+        let kolamIndicatorElement = document.getElementById('kolam-indicator');
+        let pompaStatusElement = document.getElementById('pompa-status');
+        let pompaIndicatorElement = document.getElementById('pompa-indicator');
+
+        // Listen for changes to the 'Kolam' node
+        database.ref('Kolam').on('value', (snapshot) => {
+            const status = snapshot.val();
+            if (status) {
+                kolamStatusElement.textContent = status;
+                if (status === "Siaga") {
+                    kolamIndicatorElement.className = 'status-indicator glow-orange';
+                } else { // Aman
+                    kolamIndicatorElement.className = 'status-indicator glow-green';
+                }
+            } else {
+                kolamStatusElement.textContent = "Tidak Ada Data";
+                kolamIndicatorElement.className = 'status-indicator glow-gray';
+            }
+        });
+
+        // Listen for changes to the 'Pompa' node
+        database.ref('Pompa').on('value', (snapshot) => {
+            const status = snapshot.val();
+            if (status) {
+                pompaStatusElement.textContent = status;
+                if (status === "Pompa Aktif") {
+                    pompaIndicatorElement.className = 'status-indicator glow-red';
+                } else { // Pompa Mati
+                    pompaIndicatorElement.className = 'status-indicator glow-gray';
+                }
+            } else {
+                pompaStatusElement.textContent = "Tidak Ada Data";
+                pompaIndicatorElement.className = 'status-indicator glow-gray';
+            }
+        });
+
+        // Initial status update (will be immediately overwritten by Firebase data)
+        kolamStatusElement.textContent = "Menunggu Data...";
+        pompaStatusElement.textContent = "Menunggu Data...";
+    </script>
+</body>
+</html>
